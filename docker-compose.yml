@@ -1,0 +1,233 @@
+services:
+  db-identity:
+    image: postgres:16-alpine
+    container_name: arenacore-db-identity
+    environment:
+      POSTGRES_DB: db_identity
+      POSTGRES_USER: ${POSTGRES_SUPERUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-arenacore_pg_root}
+      TZ: America/Bogota
+    ports:
+      - "55431:5432"
+    volumes:
+      - pg_identity_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-identity.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER:-postgres} -d db_identity"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - arenacore-net
+
+  db-courts:
+    image: postgres:16-alpine
+    container_name: arenacore-db-courts
+    environment:
+      POSTGRES_DB: db_courts
+      POSTGRES_USER: ${POSTGRES_SUPERUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-arenacore_pg_root}
+      TZ: America/Bogota
+    ports:
+      - "55432:5432"
+    volumes:
+      - pg_courts_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-courts.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER:-postgres} -d db_courts"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - arenacore-net
+
+  db-equipment:
+    image: postgres:16-alpine
+    container_name: arenacore-db-equipment
+    environment:
+      POSTGRES_DB: db_equipment
+      POSTGRES_USER: ${POSTGRES_SUPERUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-arenacore_pg_root}
+      TZ: America/Bogota
+    ports:
+      - "55433:5432"
+    volumes:
+      - pg_equipment_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-equipment.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER:-postgres} -d db_equipment"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - arenacore-net
+
+  db-billing:
+    image: postgres:16-alpine
+    container_name: arenacore-db-billing
+    environment:
+      POSTGRES_DB: db_billing
+      POSTGRES_USER: ${POSTGRES_SUPERUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-arenacore_pg_root}
+      TZ: America/Bogota
+    ports:
+      - "55434:5432"
+    volumes:
+      - pg_billing_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-billing.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER:-postgres} -d db_billing"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - arenacore-net
+
+  identity-service:
+    build:
+      context: ./identity-service
+      dockerfile: Dockerfile
+    container_name: arenacore-identity-service
+    ports:
+      - "8081:8081"
+    environment:
+      SERVER_PORT: 8081
+      TZ: America/Bogota
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-identity:5432/db_identity
+      SPRING_DATASOURCE_USERNAME: ${IDENTITY_APP_USER:-identity_app}
+      SPRING_DATASOURCE_PASSWORD: ${IDENTITY_APP_PASSWORD:-identity_app_pass}
+      SPRING_FLYWAY_USER: ${IDENTITY_MIGRATOR_USER:-identity_migrator}
+      SPRING_FLYWAY_PASSWORD: ${IDENTITY_MIGRATOR_PASSWORD:-identity_mig_pass}
+      ARENACORE_BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-admin@arenacore.local}
+      ARENACORE_BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-Admin1234!}
+      ARENACORE_BOOTSTRAP_OPERATOR_EMAIL: ${BOOTSTRAP_OPERATOR_EMAIL:-operador@arenacore.local}
+      ARENACORE_BOOTSTRAP_OPERATOR_PASSWORD: ${BOOTSTRAP_OPERATOR_PASSWORD:-Operador1234!}
+      ARENACORE_INTERNAL_COURTS_SECRET: ${INTERNAL_CLIENT_COURTS_SECRET:-courts-internal-secret-2026}
+      ARENACORE_INTERNAL_EQUIPMENT_SECRET: ${INTERNAL_CLIENT_EQUIPMENT_SECRET:-equipment-internal-secret-2026}
+      ARENACORE_INTERNAL_BILLING_SECRET: ${INTERNAL_CLIENT_BILLING_SECRET:-billing-internal-secret-2026}
+      ARENACORE_CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    depends_on:
+      db-identity:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    networks:
+      - arenacore-net
+
+  courts-service:
+    build:
+      context: ./courts-service
+      dockerfile: Dockerfile
+    container_name: arenacore-courts-service
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      TZ: America/Bogota
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-courts:5432/db_courts
+      SPRING_DATASOURCE_USERNAME: ${COURTS_APP_USER:-courts_app}
+      SPRING_DATASOURCE_PASSWORD: ${COURTS_APP_PASSWORD:-courts_app_pass}
+      SPRING_FLYWAY_USER: ${COURTS_MIGRATOR_USER:-courts_migrator}
+      SPRING_FLYWAY_PASSWORD: ${COURTS_MIGRATOR_PASSWORD:-courts_mig_pass}
+      ARENACORE_SECURITY_JWKS_URI: http://identity-service:8081/.well-known/jwks.json
+      ARENACORE_IDENTITY_URL: http://identity-service:8081
+      ARENACORE_EQUIPMENT_URL: http://equipment-service:8082
+      ARENACORE_BILLING_URL: http://billing-service:8083
+      ARENACORE_SERVICE_CLIENT_ID: courts-service
+      ARENACORE_SERVICE_CLIENT_SECRET: ${INTERNAL_CLIENT_COURTS_SECRET:-courts-internal-secret-2026}
+      ARENACORE_CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    depends_on:
+      db-courts:
+        condition: service_healthy
+      identity-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    networks:
+      - arenacore-net
+
+  equipment-service:
+    build:
+      context: ./equipment-service
+      dockerfile: Dockerfile
+    container_name: arenacore-equipment-service
+    ports:
+      - "8082:8082"
+    environment:
+      SERVER_PORT: 8082
+      TZ: America/Bogota
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-equipment:5432/db_equipment
+      SPRING_DATASOURCE_USERNAME: ${EQUIPMENT_APP_USER:-equipment_app}
+      SPRING_DATASOURCE_PASSWORD: ${EQUIPMENT_APP_PASSWORD:-equipment_app_pass}
+      SPRING_FLYWAY_USER: ${EQUIPMENT_MIGRATOR_USER:-equipment_migrator}
+      SPRING_FLYWAY_PASSWORD: ${EQUIPMENT_MIGRATOR_PASSWORD:-equipment_mig_pass}
+      ARENACORE_SECURITY_JWKS_URI: http://identity-service:8081/.well-known/jwks.json
+      ARENACORE_IDENTITY_URL: http://identity-service:8081
+      ARENACORE_COURTS_URL: http://courts-service:8080
+      ARENACORE_BILLING_URL: http://billing-service:8083
+      ARENACORE_SERVICE_CLIENT_ID: equipment-service
+      ARENACORE_SERVICE_CLIENT_SECRET: ${INTERNAL_CLIENT_EQUIPMENT_SECRET:-equipment-internal-secret-2026}
+      ARENACORE_CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    depends_on:
+      db-equipment:
+        condition: service_healthy
+      identity-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8082/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    networks:
+      - arenacore-net
+
+  billing-service:
+    build:
+      context: ./billing-service
+      dockerfile: Dockerfile
+    container_name: arenacore-billing-service
+    ports:
+      - "8083:8083"
+    environment:
+      SERVER_PORT: 8083
+      TZ: America/Bogota
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-billing:5432/db_billing
+      SPRING_DATASOURCE_USERNAME: ${BILLING_APP_USER:-billing_app}
+      SPRING_DATASOURCE_PASSWORD: ${BILLING_APP_PASSWORD:-billing_app_pass}
+      SPRING_FLYWAY_USER: ${BILLING_MIGRATOR_USER:-billing_migrator}
+      SPRING_FLYWAY_PASSWORD: ${BILLING_MIGRATOR_PASSWORD:-billing_mig_pass}
+      ARENACORE_SECURITY_JWKS_URI: http://identity-service:8081/.well-known/jwks.json
+      ARENACORE_IDENTITY_URL: http://identity-service:8081
+      ARENACORE_CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    depends_on:
+      db-billing:
+        condition: service_healthy
+      identity-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8083/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 25s
+    networks:
+      - arenacore-net
+
+volumes:
+  pg_identity_data:
+  pg_courts_data:
+  pg_equipment_data:
+  pg_billing_data:
+
+networks:
+  arenacore-net:
+    driver: bridge

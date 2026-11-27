@@ -1,0 +1,34 @@
+# Documento privado para sustentación (no subir al repositorio)
+SUSTENTACION_MICROSERVICIOS.md
+
+# Maven / Java
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.jar
+*.war
+*.ear
+*.class
+*.log
+
+# IDEs y editores
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# Variables de entorno y secretos locales
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
