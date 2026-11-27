@@ -2,20 +2,20 @@
 
 # ⚽ A R E N A C O R E
 
-### Sports Facility Management System
+### GolFlow · Sports Facility Management System
 
 **Reserva · Administra · Conecta**
 
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express-222222?style=for-the-badge&logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Traefik](https://img.shields.io/badge/Traefik-1689A2?style=for-the-badge&logo=traefikproxy&logoColor=white)
+![Java](https://img.shields.io/badge/Java-21-B45309?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.14-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![Flyway](https://img.shields.io/badge/Flyway-Migrations-CC0200?style=for-the-badge&logo=flyway&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 ![Estado](https://img.shields.io/badge/Estado-En_desarrollo-EAB308?style=flat-square)
-![Arquitectura](https://img.shields.io/badge/Arquitectura-Microservicios-15803D?style=flat-square)
+![Servicios](https://img.shields.io/badge/Microservicios-4-15803D?style=flat-square)
 
-[Proyecto](#proyecto) · [Documentación](#documentacion) · [Arquitectura](#arquitectura) · [Instalación](#instalacion) · [Equipo](#equipo)
+[Proyecto](#proyecto) · [Documentación](#documentacion) · [Arquitectura](#arquitectura) · [Seguridad](#seguridad) · [Instalación](#instalacion) · [Equipo](#equipo)
 
 </div>
 
@@ -24,25 +24,24 @@
 <a id="proyecto"></a>
 ## 🏟️ Sobre el proyecto
 
-ArenaCore es una propuesta de sistema de gestión de complejos deportivos y canchas sintéticas que centraliza la consulta de disponibilidad, las reservaciones y el registro de pagos mediante una arquitectura de microservicios.
+ArenaCore (GolFlow) es un backend de gestión de canchas sintéticas y complejos deportivos basado en cuatro microservicios. Centraliza usuarios, sedes, disponibilidad, reservas, préstamos de implementos, liquidaciones y pagos.
 
 ### Problemática
 
-La administración manual mediante llamadas, mensajes y registros dispersos puede ocasionar reservas duplicadas, dificultades para consultar horarios y pérdida de trazabilidad de los pagos.
+La gestión manual de horarios, inventario y cobros puede generar reservas duplicadas, inconsistencias de stock y dificultades para rastrear las operaciones.
 
 ### Objetivo
 
-Desarrollar una solución modular que facilite la administración de instalaciones deportivas y permita gestionar reservaciones de forma consistente.
+Facilitar la administración de complejos deportivos mediante servicios independientes, persistencia aislada y operaciones consistentes y trazables.
 
-### Alcance funcional previsto
+### Alcance funcional
 
-| Módulo | Funcionalidades |
+| Dominio | Funcionalidades |
 | --- | --- |
-| Instalaciones | Complejos deportivos, canchas y tarifas |
-| Reservaciones | Disponibilidad, creación, consulta y cancelación de reservas |
-| Pagos | Registro y consulta de pagos asociados a reservas |
-
-El MVP contempla reservas de una hora y registro manual de pagos. No incluye pasarela de pagos real, autenticación ni torneos. Las funcionalidades descritas corresponden al alcance previsto y no certifican su implementación.
+| Identidad | Usuarios, roles RBAC, auditoría y autenticación JWT |
+| Canchas | Sedes, fútbol 5/7/8/11, disponibilidad, reservas anti-overbooking, check-in y cierre |
+| Implementos | Catálogo, stock, kardex, préstamos por `sesionJuegoId` y devoluciones |
+| Facturación | Tarifas diurnas/nocturnas, liquidación consolidada, cajas, pagos y comprobantes |
 
 <a id="documentacion"></a>
 ## 📚 Documentación y entregables
@@ -77,102 +76,131 @@ El MVP contempla reservas de una hora y registro manual de pagos. No incluye pas
 | Carpeta de documentos externos | Pendiente <!-- URL_DRIVE --> |
 
 <a id="arquitectura"></a>
-## 🧩 Arquitectura propuesta
+## 🧩 Arquitectura de microservicios
 
 ```mermaid
 flowchart TD
-    C[Cliente REST / interfaz futura] --> T[Traefik]
-    T --> F[ms-facilities]
-    T --> R[ms-reservations]
-    T --> P[ms-payments]
-    P -->|Validar reserva| R
-    R -->|Validar cancha y tarifa| F
-    F --> D1[(Facilities DB)]
-    R --> D2[(Reservations DB)]
-    P --> D3[(Payments DB)]
+    C[Cliente API REST] --> I[Identity :8081]
+    C --> S[Courts :8080]
+    C --> E[Equipment :8082]
+    C --> B[Billing :8083]
+    I --> DI[(db_identity)]
+    S --> DS[(db_courts)]
+    E --> DE[(db_equipment)]
+    B --> DB[(db_billing)]
+    S -. JWKS .-> I
+    E -. JWKS .-> I
+    B -. JWKS .-> I
 ```
 
-| Microservicio | Responsabilidad |
+Vista lógica de servicios y persistencia; no representa todas las llamadas internas.
+
+| Servicio | Puerto | Base de datos | Puerto host DB | Responsabilidad |
+| --- | ---: | --- | ---: | --- |
+| `identity-service` | 8081 | `db_identity` | 55431 | Usuarios, RBAC, auditoría, JWT RS256, JWKS y tokens `SERVICE_INTERNAL` |
+| `courts-service` | 8080 | `db_courts` | 55432 | Sedes, canchas (`FUTBOL_5/7/8/11`), disponibilidad, reservas anti-overbooking, check-in y cierre |
+| `equipment-service` | 8082 | `db_equipment` | 55435 | Catálogo, stock, kardex, préstamos por `sesionJuegoId` y devoluciones |
+| `billing-service` | 8083 | `db_billing` | 55434 | Tarifas, liquidación consolidada con snapshot, cajas, pagos ACID y comprobantes |
+
+### Persistencia y migraciones
+
+| Servicio | Migraciones Flyway |
 | --- | --- |
-| `ms-facilities` | Administración de instalaciones y tarifas |
-| `ms-reservations` | Disponibilidad y ciclo de vida de reservas |
-| `ms-payments` | Registro de pagos |
+| Identity | V1–V3 |
+| Courts | V1–V4 |
+| Equipment | V1–V3 |
+| Billing | V1–V4 |
 
-Cada servicio dispone de una base de datos independiente en el diseño propuesto. La comunicación se realiza mediante APIs REST y Docker Compose coordina los contenedores en el entorno local.
+### Patrones implementados según la descripción técnica del equipo
 
-## 🛠️ Stack tecnológico previsto
+- **Database-per-Service:** persistencia independiente por servicio.
+- **Separación de credenciales (RNF-02):** rol migrador para DDL en Flyway y rol de aplicación para JPA en ejecución.
+- **Idempotency-Key:** creación de reservas, check-in, préstamos, liquidaciones, apertura de caja y pagos.
+- **Orquestación HTTP fuera de `@Transactional` (HT-05 / ADR-006):** evita mantener conexiones JDBC ocupadas durante llamadas remotas.
+- **Snapshot de liquidación y pagos ACID:** preservación de los datos de liquidación y consistencia transaccional de pagos.
+
+<a id="seguridad"></a>
+## 🔐 Seguridad
+
+- JWT firmado mediante RS256 y publicación de claves públicas en `/.well-known/jwks.json`.
+- Control de acceso basado en roles (RBAC).
+- Aislamiento de `/internal/v1/**` mediante `ROLE_SERVICE_INTERNAL`.
+- Tokens técnicos `SERVICE_INTERNAL` para comunicación interna.
+- Auditoría y separación de credenciales de migración y ejecución.
+
+## 🛠️ Stack tecnológico
 
 | Tecnología | Uso |
 | --- | --- |
-| Node.js / Express | Servicios REST |
-| PostgreSQL | Persistencia |
-| Docker / Compose | Entorno local reproducible |
-| Traefik | Enrutamiento |
-| PlantUML / Mermaid | Diagramas |
-| GitHub Projects | Seguimiento de tareas |
-
-## 📂 Organización propuesta del repositorio
-
-```text
-ProyectoDs3-ArenaCore/
-├── ADRs/
-├── Diagramas/
-├── docs/
-├── EventStorming/
-├── Issues/
-├── JobStories/
-├── ms-facilities/
-├── ms-reservations/
-├── ms-payments/
-└── README.md
-```
-
-Ajustar esta estructura a los archivos reales del repositorio antes de publicar la versión definitiva.
+| Java 21 / Spring Boot 3.5.14 | Backend y APIs REST |
+| PostgreSQL 16 | Persistencia independiente |
+| Flyway | Migraciones versionadas |
+| JPA | Acceso a datos |
+| Docker Compose | Entorno de cuatro servicios y cuatro bases de datos |
+| JWT RS256 / JWKS | Autenticación y seguridad |
 
 <a id="instalacion"></a>
 ## 🚀 Instalación y ejecución
 
-### Clonar el repositorio
+### Requisitos
+
+Git, Docker y Docker Compose. Java 21 para desarrollo local fuera de Docker.
+
+### Clonar
 
 ```bash
 git clone https://github.com/saesgru1025-design/ProyectoDs3-ArenaCore.git
 cd ProyectoDs3-ArenaCore
 ```
 
-### Entorno Docker (cuando esté disponible)
+### Configurar y arrancar
 
-Requisitos previstos: Git, Docker y Docker Compose. Si la configuración `docker-compose.yml` y las variables de entorno ya están disponibles y documentadas, ejecutar desde la raíz:
+En PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+En Bash:
+
+```bash
+cp .env.example .env
+```
+
+Si ya existe `.env`, conserva su configuración local en lugar de sobrescribirlo. Revisa las variables antes de iniciar.
 
 ```bash
 docker compose up --build -d
 docker compose ps
 ```
 
-Para detener el entorno:
+Si un puerto del host está ocupado, ajusta la variable correspondiente en `.env`; por ejemplo, `DB_EQUIPMENT_PORT` para Equipment (55435 según la tabla).
+
+### Credenciales iniciales (Bootstrap)
+
+| Rol | Usuario |
+| --- | --- |
+| Administrador | `admin@arenacore.local` |
+| Operador | `operador@arenacore.local` |
+
+Consultar las contraseñas iniciales en la configuración local de bootstrap o con el equipo. No publicar contraseñas activas en GitHub. Cambiar las credenciales de demostración antes de cualquier despliegue compartido.
+
+### Diagnóstico y detención
 
 ```bash
+docker compose logs --tail=100
 docker compose down
 ```
 
-La configuración, puertos, endpoints y pruebas deben verificarse antes de declarar el entorno operativo.
+## 🗺️ Hoja de ruta y entregas
 
-## 🧪 Evidencias y demostración
+- [ ] Consolidar documentación y backlog de la primera entrega.
+- [ ] Confirmar versiones, migraciones y configuración del repositorio.
+- [ ] Verificar ejecución de los cuatro servicios y cuatro bases de datos.
+- [ ] Validar flujos REST, seguridad, reservas, implementos y pagos.
+- [ ] Incorporar evidencias de la segunda entrega.
 
-| Evidencia | Enlace |
-| --- | --- |
-| Contenedores en ejecución | Pendiente <!-- URL_DOCKER --> |
-| Consultas REST | Pendiente <!-- URL_CONSULTAS --> |
-| Reservaciones y validaciones | Pendiente <!-- URL_RESERVAS --> |
-| Registro de pagos | Pendiente <!-- URL_PAGOS --> |
-| Video de demostración | Pendiente <!-- URL_VIDEO --> |
-
-## 🗺️ Hoja de ruta
-
-- [ ] Validar documentación y backlog de la primera entrega.
-- [ ] Verificar implementación de los microservicios.
-- [ ] Validar persistencia y comunicación REST.
-- [ ] Ejecutar los contenedores y comprobar su estado.
-- [ ] Consolidar evidencias y segunda entrega.
+> La arquitectura y los patrones se documentan según la descripción técnica suministrada por el equipo. Las pruebas de ejecución y los enlaces definitivos quedan pendientes de verificación.
 
 <a id="equipo"></a>
 ## 👥 Equipo de desarrollo
