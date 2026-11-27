@@ -58,7 +58,7 @@ Facilitar la administración de complejos deportivos mediante servicios independ
 | Issues | [Ver historias y tareas](https://github.com/saesgru1025-design/ProyectoDs3-ArenaCore/issues) |
 | GitHub Projects | [Ver proyectos del repositorio](https://github.com/saesgru1025-design/ProyectoDs3-ArenaCore/projects) |
 | Pull requests | [Ver contribuciones](https://github.com/saesgru1025-design/ProyectoDs3-ArenaCore/pulls) |
-| Tablero específico | Pendiente <!-- URL_TABLERO --> |
+| Tablero específico | https://github.com/users/jhoanmunoz24/projects/2/views/1 |
 | Carpeta de documentos externos | https://docs.google.com/document/d/1CXefz7ukD1axI_FweG7u9nFRiAPTHD6_2459potn_rE/edit?usp=sharing |
 
 <a id="arquitectura"></a>
@@ -184,8 +184,9 @@ docker compose down
 
 | Integrante | GitHub | Responsabilidad |
 | --- | --- | --- |
-| Pendiente de confirmar | Pendiente | Pendiente |
-| Pendiente de confirmar | Pendiente | Pendiente |
+| Cristian Ospina | Pendiente | Pendiente |
+| Samuel Grajales | Pendiente | Pendiente |
+| Jhoan Muñoz | Pendiente | Pendiente |
 
 ## 🎓 Información académica
 
