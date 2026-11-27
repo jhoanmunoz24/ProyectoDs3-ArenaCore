@@ -18,6 +18,8 @@ cp .env.example .env
 docker compose up --build -d
 ```
 
+> Si algún puerto del host (por ejemplo `55433`) está ocupado por otro proyecto en Docker, ajusta `DB_EQUIPMENT_PORT` (u otro puerto) en tu archivo `.env` local antes de levantar Compose.
+
 Verificar estado de salud de los 4 servicios y las 4 bases:
 
 ```bash
