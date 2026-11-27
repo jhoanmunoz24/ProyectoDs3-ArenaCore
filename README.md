@@ -50,20 +50,7 @@ Facilitar la administración de complejos deportivos mediante servicios independ
 
 | Entregable | Recurso |
 | --- | --- |
-| Descripción, contexto y alcance | Pendiente <!-- URL_DESCRIPCION --> |
-| Product Backlog, épicas e historias de usuario (Gherkin) | Pendiente <!-- URL_BACKLOG --> |
-| Historias técnicas y requerimientos no funcionales | Pendiente <!-- URL_REQUERIMIENTOS --> |
-| ADRs | Pendiente <!-- URL_ADRS --> |
-| Job Stories | Pendiente <!-- URL_JOB_STORIES --> |
-| Jobs To Be Done (JTBD) | Pendiente <!-- URL_JTBD --> |
-| Diagramas de secuencia PlantUML | Pendiente <!-- URL_SECUENCIA --> |
-| Queries y Actions | Pendiente <!-- URL_QUERIES_ACTIONS --> |
-| Event Storming | Pendiente <!-- URL_EVENT_STORMING --> |
-| Bounded Contexts y servicios candidatos | Pendiente <!-- URL_BOUNDED_CONTEXTS --> |
-| Modelado de datos | Pendiente <!-- URL_MODELO_DATOS --> |
-| Patrones de interacción | Pendiente <!-- URL_INTERACCION --> |
-| Informe de primera entrega | Pendiente <!-- URL_ENTREGA_1 --> |
-| Informe de segunda entrega y evidencias | Pendiente <!-- URL_ENTREGA_2 --> |
+| Informe de primera entrega |(https://docs.google.com/document/d/1CXefz7ukD1axI_FweG7u9nFRiAPTHD6_2459potn_rE/edit?usp=sharing)|
 
 ### Gestión del proyecto
 
