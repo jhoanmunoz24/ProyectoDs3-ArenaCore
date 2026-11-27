@@ -46,7 +46,6 @@ Facilitar la administración de complejos deportivos mediante servicios independ
 <a id="documentacion"></a>
 ## 📚 Documentación y entregables
 
-> Los enlaces externos quedan pendientes de incorporar. Sustituir cada comentario por un enlace Markdown al documento definitivo y comprobar los permisos de lectura.
 
 | Entregable | Recurso |
 | --- | --- |
