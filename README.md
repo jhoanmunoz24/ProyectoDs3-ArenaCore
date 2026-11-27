@@ -2,7 +2,7 @@
 
 # ⚽ A R E N A C O R E
 
-### GolFlow · Sports Facility Management System
+### ARENA CORE· Sports Facility Management System
 
 **Reserva · Administra · Conecta**
 
