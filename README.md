@@ -44,28 +44,6 @@ Desarrollar una solución modular que facilite la administración de instalacion
 
 El MVP contempla reservas de una hora y registro manual de pagos. No incluye pasarela de pagos real, autenticación ni torneos. Las funcionalidades descritas corresponden al alcance previsto y no certifican su implementación.
 
-<a id="documentacion"></a>
-## 📚 Documentación y entregables
-
-> Los enlaces externos quedan pendientes de incorporar. Sustituir cada comentario por un enlace Markdown al documento definitivo y comprobar los permisos de lectura.
-
-| Entregable | Recurso |
-| --- | --- |
-| Descripción, contexto y alcance | Pendiente <!-- URL_DESCRIPCION --> |
-| Product Backlog, épicas e historias de usuario (Gherkin) | Pendiente <!-- URL_BACKLOG --> |
-| Historias técnicas y requerimientos no funcionales | Pendiente <!-- URL_REQUERIMIENTOS --> |
-| ADRs | Pendiente <!-- URL_ADRS --> |
-| Job Stories | Pendiente <!-- URL_JOB_STORIES --> |
-| Jobs To Be Done (JTBD) | Pendiente <!-- URL_JTBD --> |
-| Diagramas de secuencia PlantUML | Pendiente <!-- URL_SECUENCIA --> |
-| Queries y Actions | Pendiente <!-- URL_QUERIES_ACTIONS --> |
-| Event Storming | Pendiente <!-- URL_EVENT_STORMING --> |
-| Bounded Contexts y servicios candidatos | Pendiente <!-- URL_BOUNDED_CONTEXTS --> |
-| Modelado de datos | Pendiente <!-- URL_MODELO_DATOS --> |
-| Patrones de interacción | Pendiente <!-- URL_INTERACCION --> |
-| Informe de primera entrega | Pendiente <!-- URL_ENTREGA_1 --> |
-| Informe de segunda entrega y evidencias | Pendiente <!-- URL_ENTREGA_2 --> |
-
 ### Gestión del proyecto
 
 | Recurso | Acceso |
@@ -74,7 +52,7 @@ El MVP contempla reservas de una hora y registro manual de pagos. No incluye pas
 | GitHub Projects | [Ver proyectos del repositorio](https://github.com/saesgru1025-design/ProyectoDs3-ArenaCore/projects) |
 | Pull requests | [Ver contribuciones](https://github.com/saesgru1025-design/ProyectoDs3-ArenaCore/pulls) |
 | Tablero específico | Pendiente <!-- URL_TABLERO --> |
-| Carpeta de documentos externos | Pendiente <!-- URL_DRIVE --> |
+| Carpeta de documentos externos |https://docs.google.com/document/d/1CXefz7ukD1axI_FweG7u9nFRiAPTHD6_2459potn_rE/edit?usp=sharing |
 
 <a id="arquitectura"></a>
 ## 🧩 Arquitectura propuesta
@@ -166,13 +144,6 @@ La configuración, puertos, endpoints y pruebas deben verificarse antes de decla
 | Registro de pagos | Pendiente <!-- URL_PAGOS --> |
 | Video de demostración | Pendiente <!-- URL_VIDEO --> |
 
-## 🗺️ Hoja de ruta
-
-- [ ] Validar documentación y backlog de la primera entrega.
-- [ ] Verificar implementación de los microservicios.
-- [ ] Validar persistencia y comunicación REST.
-- [ ] Ejecutar los contenedores y comprobar su estado.
-- [ ] Consolidar evidencias y segunda entrega.
 
 <a id="equipo"></a>
 ## 👥 Equipo de desarrollo
