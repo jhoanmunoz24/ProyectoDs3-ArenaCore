@@ -8,7 +8,7 @@ Sistema de gestión de canchas sintéticas y complejos deportivos construido con
 | :--- | :--- | :--- | :--- | :--- |
 | `identity-service` | `8081` | `db_identity` | `55431` | Usuarios, roles RBAC, auditoría, JWT RS256, `/.well-known/jwks.json` y tokens `SERVICE_INTERNAL`. |
 | `courts-service` | `8080` | `db_courts` | `55432` | Sedes, canchas (`FUTBOL_5/7/8/11`), disponibilidad, reservas anti-overbooking, check-in y cierre. |
-| `equipment-service` | `8082` | `db_equipment` | `55433` | Catálogo de implementos deportivos, stock, kardex, préstamos por `sesionJuegoId` y devoluciones. |
+| `equipment-service` | `8082` | `db_equipment` | `55435` | Catálogo de implementos deportivos, stock, kardex, préstamos por `sesionJuegoId` y devoluciones. |
 | `billing-service` | `8083` | `db_billing` | `55434` | Tarifas diurnas/nocturnas, liquidación consolidada con snapshot, cajas, pagos ACID y comprobantes. |
 
 ## Arranque con Docker Compose

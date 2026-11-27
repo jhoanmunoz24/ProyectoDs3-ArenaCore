@@ -5,7 +5,7 @@ spring:
   application:
     name: equipment-service
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:55433/db_equipment}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:55435/db_equipment}
     username: ${SPRING_DATASOURCE_USERNAME:equipment_app}
     password: ${SPRING_DATASOURCE_PASSWORD:equipment_app_pass}
     hikari:
